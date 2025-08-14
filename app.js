@@ -5,6 +5,12 @@ const db = require('./db'); // This should initialize and export all models
 
 
 const designationRoutes = require('./routes/designationRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const priorityRoutes = require('./routes/priorityRoutes');
+const severityRoutes = require('./routes/severityRoutes');
+const defectStatusRoutes = require('./routes/defectStatusRoutes');
+const releaseTypeRoutes = require('./routes/releaseTypeRoutes');
+const defectTypeRoutes = require('./routes/defectTypeRoutes');
 
 // Middleware
 app.use(express.json());
@@ -12,6 +18,12 @@ app.use(express.json());
 
 // Register routes
 app.use('/api/designations', designationRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/priorities', priorityRoutes);
+app.use('/api/severities', severityRoutes);
+app.use('/api/defect-statuses', defectStatusRoutes);
+app.use('/api/release-types', releaseTypeRoutes);
+app.use('/api/defect-types', defectTypeRoutes);
 //app.use('/api/role', roleRoutes);
 
 
