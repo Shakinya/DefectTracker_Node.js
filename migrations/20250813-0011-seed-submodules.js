@@ -1,9 +1,14 @@
 module.exports.up = async (sequelize) => {
   const rows = [
     { sub_module_id: 'AUTH-LOGIN', sub_module_name: 'Login Flow', module_code: 'ALPHA-AUTH' },
+    { sub_module_id: 'AUTH-PASSWORD', sub_module_name: 'Password Management', module_code: 'ALPHA-AUTH' },
     { sub_module_id: 'AUTH-REGISTER', sub_module_name: 'Registration Flow', module_code: 'ALPHA-AUTH' },
     { sub_module_id: 'API-ORDERS', sub_module_name: 'Orders Endpoint', module_code: 'ALPHA-API' },
     { sub_module_id: 'BETA-CORE-MAIN', sub_module_name: 'Core Main', module_code: 'BETA-CORE' },
+    { sub_module_id: 'SEARCH-MAIN', sub_module_name: 'Search Main', module_code: 'BETA-SEARCH' },
+    { sub_module_id: 'BETA-SEARCH', sub_module_name: 'Search Functionality', module_code: 'BETA-SEARCH' },
+    { sub_module_id: 'CHECKOUT-UI', sub_module_name: 'Checkout UI', module_code: 'BETA-CHECKOUT' },
+    { sub_module_id: 'BETA-CHECKOUT', sub_module_name: 'Checkout Process', module_code: 'BETA-CHECKOUT' },
   ];
 
   for (const r of rows) {
@@ -25,7 +30,7 @@ module.exports.up = async (sequelize) => {
 };
 
 module.exports.down = async (sequelize) => {
-  const ids = ['AUTH-LOGIN', 'AUTH-REGISTER', 'API-ORDERS'];
+  const ids = ['AUTH-LOGIN', 'AUTH-PASSWORD', 'AUTH-REGISTER', 'API-ORDERS', 'BETA-CORE-MAIN', 'SEARCH-MAIN', 'BETA-SEARCH', 'CHECKOUT-UI', 'BETA-CHECKOUT'];
   await sequelize.query(
     `DELETE FROM \`sub_module\` WHERE \`sub_module_id\` IN (${ids.map(() => '?').join(',')})`,
     { replacements: ids }

@@ -12,12 +12,32 @@ module.exports.up = async (sequelize) => {
     },
     {
       test_case_id: 'TC-ALPHA-002',
-      description: 'User can register with valid details',
-      steps: 'Open register page; Fill form; Submit',
+      description: 'User can reset password with valid email',
+      steps: 'Open password reset page; Enter valid email; Submit',
       project_code: 'P-2024-001',
       module_code: 'ALPHA-AUTH',
-      sub_module_code: 'AUTH-REGISTER',
+      sub_module_code: 'AUTH-PASSWORD',
       severity_name: 'Minor',
+      defect_type_name: 'Task',
+    },
+    {
+      test_case_id: 'TC-BETA-001',
+      description: 'Search functionality works correctly',
+      steps: 'Open search page; Enter search term; Verify results',
+      project_code: 'P-2024-002',
+      module_code: 'BETA-SEARCH',
+      sub_module_code: 'BETA-SEARCH',
+      severity_name: 'Major',
+      defect_type_name: 'Bug',
+    },
+    {
+      test_case_id: 'TC-BETA-002',
+      description: 'Checkout process completes successfully',
+      steps: 'Add items to cart; Proceed to checkout; Complete payment',
+      project_code: 'P-2024-002',
+      module_code: 'BETA-CHECKOUT',
+      sub_module_code: 'BETA-CHECKOUT',
+      severity_name: 'Major',
       defect_type_name: 'Task',
     },
   ];
@@ -72,7 +92,7 @@ module.exports.up = async (sequelize) => {
 };
 
 module.exports.down = async (sequelize) => {
-  const ids = ['TC-ALPHA-001', 'TC-ALPHA-002'];
+  const ids = ['TC-ALPHA-001', 'TC-ALPHA-002', 'TC-BETA-001', 'TC-BETA-002'];
   await sequelize.query(
     `DELETE FROM \`test_case\` WHERE \`test_case_id\` IN (${ids.map(() => '?').join(',')})`,
     { replacements: ids }

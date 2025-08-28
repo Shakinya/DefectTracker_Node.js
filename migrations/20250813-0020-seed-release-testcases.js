@@ -1,7 +1,9 @@
 module.exports.up = async (sequelize) => {
   const rows = [
     { release_tag: 'ALPHA-R1', tc_tag: 'TC-ALPHA-001', owner_email: 'alice@example.com', description: 'Login passes in R1', test_case_status: 'PASS', test_date: '2024-04-01 10:00:00', test_time: '10:00:00' },
-    { release_tag: 'BETA-R1',  tc_tag: 'TC-ALPHA-002', owner_email: 'bob@example.com',   description: 'Register new user',  test_case_status: 'NEW',  test_date: '2024-05-10 11:30:00', test_time: '11:30:00' },
+    { release_tag: 'ALPHA-R1', tc_tag: 'TC-ALPHA-002', owner_email: 'bob@example.com', description: 'Password reset in R1', test_case_status: 'NEW', test_date: '2024-04-01 10:00:00', test_time: '10:00:00' },
+    { release_tag: 'BETA-R1',  tc_tag: 'TC-BETA-001', owner_email: 'bob@example.com',   description: 'Search functionality',  test_case_status: 'NEW',  test_date: '2024-05-10 11:30:00', test_time: '11:30:00' },
+    { release_tag: 'BETA-R1',  tc_tag: 'TC-BETA-002', owner_email: 'bob@example.com',   description: 'Checkout process',  test_case_status: 'NEW',  test_date: '2024-05-10 11:30:00', test_time: '11:30:00' },
   ];
 
   for (const r of rows) {
@@ -42,7 +44,7 @@ module.exports.up = async (sequelize) => {
 };
 
 module.exports.down = async (sequelize) => {
-  const ids = ['ALPHA-R1-TC-ALPHA-001','BETA-R1-TC-ALPHA-002'];
+  const ids = ['ALPHA-R1-TC-ALPHA-001', 'ALPHA-R1-TC-ALPHA-002', 'BETA-R1-TC-BETA-001', 'BETA-R1-TC-BETA-002'];
   await sequelize.query(
     `DELETE FROM \`release_test_case\` WHERE \`release_test_case_id\` IN (${ids.map(() => '?').join(',')})`,
     { replacements: ids }

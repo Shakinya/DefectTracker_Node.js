@@ -36,6 +36,54 @@ module.exports.up = async (sequelize) => {
       join_date: '2024-03-05 00:00:00',
       designation: 'QA Engineer',
     },
+    {
+      email: 'charlie@example.com',
+      first_name: 'Charlie',
+      last_name: 'Wilson',
+      password: 'password123',
+      phone_no: '1112223333',
+      user_id: 'U1004',
+      user_gender: 'Male',
+      user_status: 'Active',
+      join_date: '2024-01-20 00:00:00',
+      designation: 'Software Engineer',
+    },
+    {
+      email: 'david@example.com',
+      first_name: 'David',
+      last_name: 'Brown',
+      password: 'password123',
+      phone_no: '4445556666',
+      user_id: 'U1005',
+      user_gender: 'Male',
+      user_status: 'Active',
+      join_date: '2024-02-10 00:00:00',
+      designation: 'Senior Software Engineer',
+    },
+    {
+      email: 'eva@example.com',
+      first_name: 'Eva',
+      last_name: 'Martinez',
+      password: 'password123',
+      phone_no: '7778889999',
+      user_id: 'U1006',
+      user_gender: 'Female',
+      user_status: 'Active',
+      join_date: '2024-03-01 00:00:00',
+      designation: 'QA Engineer',
+    },
+    {
+      email: 'frank@example.com',
+      first_name: 'Frank',
+      last_name: 'Taylor',
+      password: 'password123',
+      phone_no: '0001112222',
+      user_id: 'U1007',
+      user_gender: 'Male',
+      user_status: 'Active',
+      join_date: '2024-03-15 00:00:00',
+      designation: 'Software Engineer',
+    },
   ];
 
   for (const u of users) {
@@ -70,7 +118,7 @@ module.exports.up = async (sequelize) => {
 };
 
 module.exports.down = async (sequelize) => {
-  const userIds = ['U1001', 'U1002', 'U1003'];
+  const userIds = ['U1001', 'U1002', 'U1003', 'U1004', 'U1005', 'U1006', 'U1007'];
   await sequelize.query(
     `DELETE FROM \`user\` WHERE \`user_id\` IN (${userIds.map(() => '?').join(',')})`,
     { replacements: userIds }

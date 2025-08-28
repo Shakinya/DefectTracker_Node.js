@@ -3,6 +3,8 @@ module.exports.up = async (sequelize) => {
     { module_id: 'ALPHA-AUTH', module_name: 'Authentication', project_code: 'P-2024-001' },
     { module_id: 'ALPHA-API', module_name: 'Public API', project_code: 'P-2024-001' },
     { module_id: 'BETA-CORE', module_name: 'Core', project_code: 'P-2024-002' },
+    { module_id: 'BETA-SEARCH', module_name: 'Search', project_code: 'P-2024-002' },
+    { module_id: 'BETA-CHECKOUT', module_name: 'Checkout', project_code: 'P-2024-002' },
   ];
 
   for (const r of rows) {
@@ -24,7 +26,7 @@ module.exports.up = async (sequelize) => {
 };
 
 module.exports.down = async (sequelize) => {
-  const ids = ['ALPHA-AUTH', 'ALPHA-API', 'BETA-CORE'];
+  const ids = ['ALPHA-AUTH', 'ALPHA-API', 'BETA-CORE', 'BETA-SEARCH', 'BETA-CHECKOUT'];
   await sequelize.query(
     `DELETE FROM \`modules\` WHERE \`module_id\` IN (${ids.map(() => '?').join(',')})`,
     { replacements: ids }
