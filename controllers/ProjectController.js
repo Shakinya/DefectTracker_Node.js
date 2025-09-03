@@ -20,5 +20,19 @@ async function getById(req, res) {
   }
 }
 
-module.exports = { getAll, getById };
+async function getProjectCardColors(req, res) {
+  try {
+    const data = await projectService.getProjectCardColors();
+    return res.json({
+      status: 'success',
+      message: 'Retrieved successfully',
+      statusCode: 2000,
+      data: data,
+    });
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: error.message, statusCode: 5000 });
+  }
+}
+
+module.exports = { getAll, getById, getProjectCardColors };
 

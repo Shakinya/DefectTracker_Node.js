@@ -175,10 +175,176 @@ async function getDefectRemarkRatio(projectId) {
     };
 }
 
+async function getDefectDistributionByType(projectId) {
+    const { sequelize } = db;
+
+    if (!projectId) {
+        throw new Error('Project ID is required for defect distribution calculation.');
+    }
+
+    // Get defect distribution by type, excluding rejected and duplicate/duplicated statuses
+    const [defectTypeStats] = await sequelize.query(
+        `SELECT 
+            dt.defect_type_name AS defectType,
+            COUNT(d.id) AS defectCount
+         FROM defect_type dt
+         LEFT JOIN defect d ON d.type_id = dt.id 
+            AND d.project_id = :projectId
+         LEFT JOIN defect_status ds ON d.defect_status_id = ds.id
+         WHERE (d.id IS NULL OR ds.defect_status_name NOT IN ('Rejected', 'Duplicate', 'Duplicated'))
+         GROUP BY dt.id, dt.defect_type_name
+         HAVING defectCount > 0
+         ORDER BY defectCount DESC`,
+        { replacements: { projectId } }
+    );
+
+    // Calculate total defect count
+    const totalDefectCount = defectTypeStats.reduce((sum, item) => sum + Number(item.defectCount), 0);
+
+    // Calculate percentages and find most common defect type
+    let mostCommonDefectType = null;
+    let mostCommonDefectCount = 0;
+
+    const defectTypes = defectTypeStats.map(item => {
+        const defectCount = Number(item.defectCount);
+        const percentage = totalDefectCount === 0 ? 0 : (defectCount / totalDefectCount) * 100;
+
+        // Track most common defect type
+        if (defectCount > mostCommonDefectCount) {
+            mostCommonDefectCount = defectCount;
+            mostCommonDefectType = item.defectType;
+        }
+
+        return {
+            defectType: item.defectType,
+            defectCount: defectCount,
+            percentage: parseFloat(percentage.toFixed(1))
+        };
+    });
+
+    return {
+        defectTypes,
+        totalDefectCount,
+        mostCommonDefectType,
+        mostCommonDefectCount
+    };
+}
+
+async function getDefectCountByModule(projectId) {
+    const { sequelize } = db;
+
+    if (!projectId) {
+        throw new Error('Project ID is required for defect count by module calculation.');
+    }
+
+    // Get defect count by module, excluding rejected and duplicate/duplicated statuses
+    const [moduleStats] = await sequelize.query(
+        `SELECT 
+            m.id AS moduleId,
+            m.module_name AS name,
+            COUNT(d.id) AS value
+         FROM modules m
+         LEFT JOIN defect d ON d.modules_id = m.id 
+            AND d.project_id = :projectId
+         LEFT JOIN defect_status ds ON d.defect_status_id = ds.id
+         WHERE m.project_id = :projectId
+         AND (d.id IS NULL OR ds.defect_status_name NOT IN ('Rejected', 'Duplicate', 'Duplicated'))
+         GROUP BY m.id, m.module_name
+         HAVING value > 0
+         ORDER BY value DESC`,
+        { replacements: { projectId } }
+    );
+
+    // Calculate total defect count
+    const totalDefectCount = moduleStats.reduce((sum, item) => sum + Number(item.value), 0);
+
+    // Calculate percentages
+    const moduleData = moduleStats.map(item => {
+        const defectCount = Number(item.value);
+        const percentage = totalDefectCount === 0 ? 0 : (defectCount / totalDefectCount) * 100;
+
+        return {
+            moduleId: Number(item.moduleId),
+            name: item.name,
+            value: defectCount,
+            percentage: parseFloat(percentage.toFixed(2))
+        };
+    });
+
+    return moduleData;
+}
+
+async function getDefectSeverityBreakdown(projectId) {
+    const { sequelize } = db;
+
+    if (!projectId) {
+        throw new Error('Project ID is required for defect severity breakdown.');
+    }
+
+    // Project metadata
+    const [projectRows] = await sequelize.query(
+        'SELECT `project_name` FROM `project` WHERE `id` = ? LIMIT 1',
+        { replacements: [projectId] }
+    );
+    const projectName = projectRows?.[0]?.project_name || '';
+
+    // Totals for all defects (including rejected/duplicate/duplicated)
+    const [totalRows] = await sequelize.query(
+        `SELECT COUNT(*) AS total
+         FROM \`defect\`
+         WHERE \`project_id\` = ?`,
+        { replacements: [projectId] }
+    );
+    const totalDefects = Number(totalRows?.[0]?.total || 0);
+
+    // Breakdown by severity and status (include all statuses)
+    const [rows] = await sequelize.query(
+        `SELECT 
+            s.severity_name AS severity,
+            s.severity_color AS severityColor,
+            ds.defect_status_name AS statusName,
+            ds.color_code AS statusColor,
+            COUNT(d.id) AS count
+         FROM severity s
+         LEFT JOIN defect d ON d.severity_id = s.id AND d.project_id = :projectId
+         LEFT JOIN defect_status ds ON d.defect_status_id = ds.id
+         GROUP BY s.id, s.severity_name, s.severity_color, ds.defect_status_name, ds.color_code
+         HAVING count > 0
+         ORDER BY s.id, count DESC`,
+        { replacements: { projectId } }
+    );
+
+    const bySeverity = new Map();
+    for (const r of rows) {
+        const sev = r.severity || 'Unknown';
+        const statusName = r.statusName || 'Unknown';
+        const count = Number(r.count || 0);
+
+        if (!bySeverity.has(sev)) {
+            bySeverity.set(sev, { severity: sev, severityColor: r.severityColor || 'Gray', total: 0, statuses: [] });
+        }
+        const item = bySeverity.get(sev);
+        item.total += count;
+        item.statuses.push({ name: statusName, value: count, color: r.statusColor || 'Gray' });
+    }
+
+    const defectSummary = Array.from(bySeverity.values());
+
+    return {
+        projectId: Number(projectId),
+        projectName,
+        totalDefects,
+        defectSummary,
+    };
+}
+
 module.exports = {
     getDefectSeverityIndex,
     getDefectDensity,
     getDefectRemarkRatio,
+    getDefectDistributionByType,
+    getDefectCountByModule,
+    getDefectSeverityBreakdown,
 };
 
 
